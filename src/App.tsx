@@ -112,7 +112,7 @@ const App = () => {
             required
           />
         </Flex>
-        <Button marginTop="1em" type="submit" variation="primary">
+        <Button variation="primary" colorTheme="warning" marginTop="1em" type="submit">
           Submit
         </Button>
       </View>
@@ -134,10 +134,10 @@ const App = () => {
               {note.name}
             </Text>
             {edit?.id === note.id ?
-              <View as="form" onSubmit={updateNote}>
+              <View padding="2px 0" width="80%" as="form" onSubmit={updateNote}>
                 <Flex
                   direction="row"
-                  justifyContent="space-between"
+                  justifyContent="start"
                   alignItems="center">
                   <TextField
                     name="update-description"
@@ -145,11 +145,12 @@ const App = () => {
                     labelHidden
                     defaultValue={note.description}
                     variation="quiet"
-                    width="60%"
+                    width="100%"
+                    textAlign="left"
                     required
                   />
-                  <Button marginTop="1em" type="submit" variation="primary">
-                    Submit
+                  <Button marginRight=".5rem" size="small" type="submit" variation="primary" colorTheme="overlay">
+                    edit
                   </Button>
                 </Flex>
 
