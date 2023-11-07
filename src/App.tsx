@@ -95,7 +95,7 @@ const App = () => {
         <Flex direction="row" justifyContent="center">
           <TextField
             name="name"
-            placeholder="Note Name"
+            placeholder="Your Name"
             label="Name"
             labelHidden
             variation="quiet"
