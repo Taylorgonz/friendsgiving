@@ -4,9 +4,13 @@ import "@aws-amplify/ui-react/styles.css";
 import { API } from "aws-amplify";
 import {
   Button,
+  CheckboxField,
+  Fieldset,
   Flex,
   Heading,
   Image,
+  Radio,
+  RadioGroupField,
   Text,
   TextField,
   View,
@@ -24,9 +28,11 @@ interface INote {
   id: number,
   name: string,
   description: string
+  type: string
 }
 const App = () => {
   const [notes, setNotes] = useState<INote[]>([]);
+  const [addNote, setAddNote] = useState<boolean>(false);
   const [edit, setEdit] = useState<INote | null>(null);
 
   useEffect(() => {
@@ -45,6 +51,7 @@ const App = () => {
     const data = {
       name: form.get("name"),
       description: form.get("description"),
+      type: form.get("type")
     };
     await API.graphql({
       query: createNoteMutation,
@@ -52,6 +59,7 @@ const App = () => {
     });
     fetchNotes();
     event.target.reset();
+    setAddNote(false);
   }
 
   async function deleteNote(id: number) {
@@ -80,6 +88,54 @@ const App = () => {
 
   return (
     <View margin="0 0 10rem 0" className="App">
+      {addNote &&
+        <View className="noteModal">
+          <View position="relative" className="modalBody" as="form" margin="3rem 0" onSubmit={createNote}>
+            <Text position="absolute" right="0" top="0" margin="1rem" fontSize="large" fontWeight="700" onClick={() => setAddNote(false)}>
+              X
+            </Text>
+            <Flex height="100%" direction="column" justifyContent="space-between">
+              <Heading className="modalHeader" level={3}>
+                What're you bringing?
+              </Heading>
+
+              <TextField
+                name="name"
+                placeholder="Your Name"
+                label="Name"
+                labelHidden
+                variation="quiet"
+                required
+                width="100%"
+              />
+              <TextField
+                name="description"
+                placeholder="What're you bringing?"
+                label="Note Description"
+                labelHidden
+                variation="quiet"
+                width="100%"
+                required
+              />
+              <RadioGroupField
+                label="Which one?"
+                name="type"
+                direction="row"
+                alignItems="center"
+              >
+                <Radio value="dish">Dish</Radio>
+                <Radio value="desert">Desert</Radio>
+                <Radio value="drink">Drink</Radio>
+              </RadioGroupField>
+
+              <Button variation="primary" colorTheme="warning" marginTop="1em" type="submit">
+                Submit
+              </Button>
+            </Flex>
+
+          </View>
+        </View>
+      }
       <View
         className="hero"
         width="100%"
@@ -91,84 +147,181 @@ const App = () => {
           GONZ-GIVING
         </Heading>
       </View>
-      <View as="form" margin="3rem 0" onSubmit={createNote}>
-        <Flex direction="row" justifyContent="center">
-          <TextField
-            name="name"
-            placeholder="Your Name"
-            label="Name"
-            labelHidden
-            variation="quiet"
-            required
-            width="30%"
-          />
-          <TextField
-            name="description"
-            placeholder="What're you bringing?"
-            label="Note Description"
-            labelHidden
-            variation="quiet"
-            width="60%"
-            required
-          />
-        </Flex>
-        <Button variation="primary" colorTheme="warning" marginTop="1em" type="submit">
-          Submit
-        </Button>
-      </View>
-      <Heading level={3}>CHECK THE LIST BEFORE YOU SUBMIT!</Heading>
+      
+      <Heading marginTop="1rem" level={4}>WHAT'RE YOU BRINGING?</Heading>
+      <Button variation="primary" colorTheme="warning" margin="1rem 0" onClick={() => setAddNote(true)}>
+        Add +
+      </Button>
+      <View width="90%" marginInline="auto">
 
-      <View
-        margin="2rem 0"
-        className="submission-view"
-      >
-        {notes.map((note) => (
-          <Flex
-            key={note.id || note.name}
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            className="submissions"
-          >
-            <Text padding=".5rem" className="name" width="30%" as="strong" fontWeight={700}>
-              {note.name}
-            </Text>
-            {edit?.id === note.id ?
-              <View padding="2px 0" width="80%" as="form" onSubmit={updateNote}>
-                <Flex
-                  direction="row"
-                  justifyContent="start"
-                  alignItems="center">
-                  <TextField
-                    name="update-description"
-                    label="Note Description"
-                    labelHidden
-                    defaultValue={note.description}
-                    variation="quiet"
-                    width="100%"
-                    textAlign="left"
-                    required
-                  />
-                  <Button marginRight=".5rem" size="small" type="submit" variation="primary" colorTheme="overlay">
-                    edit
+        <Heading className="submission-view" textAlign="left" level={2}>
+          Dish
+        </Heading>
+
+        <View
+          margin="2rem 0"
+          className="submission-view"
+        >
+          {notes.filter((note) => note.type === "dish").map((note) => (
+            <Flex
+              key={note.id || note.name}
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              className="submissions"
+            >
+              <Text padding=".5rem" className="name" width="30%" as="strong" fontWeight={700}>
+                {note.name}
+              </Text>
+              {edit?.id === note.id ?
+                <View padding="2px 0" width="80%" as="form" onSubmit={updateNote}>
+                  <Flex
+                    direction="row"
+                    justifyContent="start"
+                    alignItems="center">
+                    <TextField
+                      name="update-description"
+                      label="Note Description"
+                      labelHidden
+                      defaultValue={note.description}
+                      variation="quiet"
+                      width="100%"
+                      textAlign="left"
+                      required
+                    />
+                    <Button marginRight=".5rem" size="small" type="submit" variation="primary" colorTheme="overlay">
+                      edit
+                    </Button>
+                  </Flex>
+
+                </View>
+                : <>
+                  <Text width="60%" textAlign="left" as="span">{note.description}</Text>
+
+                  <Button padding="1px" type="submit" variation="link" onClick={() => {
+                    setEdit(note)
+                  }}>
+                    <Image width="24px" src={Edit} alt="trash can icon" />
                   </Button>
-                </Flex>
+                  <Button marginRight=".5rem" padding="1px" variation="link" onClick={() => deleteNote(note.id)}>
+                    <Image width="24px" src={Delete} alt="trash can icon" />
+                  </Button>
+                </>}
+            </Flex>
+          ))}
+        </View>
+        <Heading className="submission-view" textAlign="left" level={2}>
+          Desert
+        </Heading>
 
-              </View>
-              : <>
-                <Text width="60%" textAlign="left" as="span">{note.description}</Text>
+        <View
+          margin="2rem 0"
+          className="submission-view"
+        >
+          {notes.filter((note) => note.type === "desert").map((note) => (
+            <Flex
+              key={note.id || note.name}
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              className="submissions"
+            >
+              <Text padding=".5rem" className="name" width="30%" as="strong" fontWeight={700}>
+                {note.name}
+              </Text>
+              {edit?.id === note.id ?
+                <View padding="2px 0" width="80%" as="form" onSubmit={updateNote}>
+                  <Flex
+                    direction="row"
+                    justifyContent="start"
+                    alignItems="center">
+                    <TextField
+                      name="update-description"
+                      label="Note Description"
+                      labelHidden
+                      defaultValue={note.description}
+                      variation="quiet"
+                      width="100%"
+                      textAlign="left"
+                      required
+                    />
+                    <Button marginRight=".5rem" size="small" type="submit" variation="primary" colorTheme="overlay">
+                      edit
+                    </Button>
+                  </Flex>
 
-                <Button padding="1px" type="submit" variation="link" onClick={() => {
-                  setEdit(note)
-                }}>
-                  <Image width="24px" src={Edit} alt="trash can icon" />
-                </Button>
-                <Button marginRight=".5rem" padding="1px" variation="link" onClick={() => deleteNote(note.id)}>
-                  <Image width="24px" src={Delete} alt="trash can icon" />
-                </Button>
-              </>}
-          </Flex>
-        ))}
+                </View>
+                : <>
+                  <Text width="60%" textAlign="left" as="span">{note.description}</Text>
+
+                  <Button padding="1px" type="submit" variation="link" onClick={() => {
+                    setEdit(note)
+                  }}>
+                    <Image width="24px" src={Edit} alt="trash can icon" />
+                  </Button>
+                  <Button marginRight=".5rem" padding="1px" variation="link" onClick={() => deleteNote(note.id)}>
+                    <Image width="24px" src={Delete} alt="trash can icon" />
+                  </Button>
+                </>}
+            </Flex>
+          ))}
+        </View>
+        <Heading textAlign="left" level={2}>
+          Drink
+        </Heading>
+
+        <View
+          margin="2rem 0"
+          className={notes.find((note) => note.type === "drink") ? "submission-view" : ""}
+        >
+          {notes.filter((note) => note.type === "drink").map((note) => (
+            <Flex
+              key={note.id || note.name}
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              className="submissions"
+            >
+              <Text padding=".5rem" className="name" width="30%" as="strong" fontWeight={700}>
+                {note.name}
+              </Text>
+              {edit?.id === note.id ?
+                <View padding="2px 0" width="80%" as="form" onSubmit={updateNote}>
+                  <Flex
+                    direction="row"
+                    justifyContent="start"
+                    alignItems="center">
+                    <TextField
+                      name="update-description"
+                      label="Note Description"
+                      labelHidden
+                      defaultValue={note.description}
+                      variation="quiet"
+                      width="100%"
+                      textAlign="left"
+                      required
+                    />
+                    <Button marginRight=".5rem" size="small" type="submit" variation="primary" colorTheme="overlay">
+                      edit
+                    </Button>
+                  </Flex>
+
+                </View>
+                : <>
+                  <Text width="60%" textAlign="left" as="span">{note.description}</Text>
+
+                  <Button padding="1px" type="submit" variation="link" onClick={() => {
+                    setEdit(note)
+                  }}>
+                    <Image width="24px" src={Edit} alt="trash can icon" />
+                  </Button>
+                  <Button marginRight=".5rem" padding="1px" variation="link" onClick={() => deleteNote(note.id)}>
+                    <Image width="24px" src={Delete} alt="trash can icon" />
+                  </Button>
+                </>}
+            </Flex>
+          ))}
+        </View>
       </View>
     </View>
   );

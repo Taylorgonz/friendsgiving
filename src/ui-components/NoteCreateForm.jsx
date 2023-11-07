@@ -24,20 +24,24 @@ export default function NoteCreateForm(props) {
   const initialValues = {
     name: "",
     description: "",
+    type: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
+  const [type, setType] = React.useState(initialValues.type);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
     setDescription(initialValues.description);
+    setType(initialValues.type);
     setErrors({});
   };
   const validations = {
     name: [{ type: "Required" }],
     description: [],
+    type: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -67,6 +71,7 @@ export default function NoteCreateForm(props) {
         let modelFields = {
           name,
           description,
+          type,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -131,6 +136,7 @@ export default function NoteCreateForm(props) {
             const modelFields = {
               name: value,
               description,
+              type,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -156,6 +162,7 @@ export default function NoteCreateForm(props) {
             const modelFields = {
               name,
               description: value,
+              type,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -169,6 +176,32 @@ export default function NoteCreateForm(props) {
         errorMessage={errors.description?.errorMessage}
         hasError={errors.description?.hasError}
         {...getOverrideProps(overrides, "description")}
+      ></TextField>
+      <TextField
+        label="Type"
+        isRequired={false}
+        isReadOnly={false}
+        value={type}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              description,
+              type: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.type ?? value;
+          }
+          if (errors.type?.hasError) {
+            runValidationTasks("type", value);
+          }
+          setType(value);
+        }}
+        onBlur={() => runValidationTasks("type", type)}
+        errorMessage={errors.type?.errorMessage}
+        hasError={errors.type?.hasError}
+        {...getOverrideProps(overrides, "type")}
       ></TextField>
       <Flex
         justifyContent="space-between"
