@@ -1,38 +1,43 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Bebas+Neue&display=swap');
+
+
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.hero {
+  background: linear-gradient( rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4) ), url(./images/DSC05088.jpg);
+  background-color: black;
+  background-position-y: 35%;
+  height: 600px;
+  background-position-x: center;
+  background-size: cover;
+  font-family: 'Abril Fatface', serif;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+}
+h1.amplify-heading--1 {
+  font-size: 10em;
+}
+div.submission-view {
+  border-top: 2px solid black;
+}
+strong.name {
+  border-right: 2px solid black;
+}
+div.submissions {
+  border-bottom: 2px solid black;
+  /* padding-block: .5rem; */
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@media screen and (max-width: 600px) {
+  .hero {
+    background-position-y: 35%;
+    height: 400px;
   }
-  to {
-    transform: rotate(360deg);
+  h1.amplify-heading--1 {
+    font-size: 5em;
   }
 }
